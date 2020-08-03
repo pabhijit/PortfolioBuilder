@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+    flask:
+        # Build the flask application
+        build: ./flask
+
+        # Provide a name for the flask container (Remember this becomes
+        # your hostname. So, if this is changed, nginx conf must be modified)
+        container_name: flask
+
+        # Instruct Docker to always restart the service
+        restart: always
+
+        # Set any environment variables here
+        environment:
+            - APP_NAME=PortfolioBuilder
+
+        # uWSGI will be serving our flask application on port 8080
+        expose:
+            - 8080
+
+        # Mount the container log directory to the local log directory
+        # Consider changing this to /var/log/uwsgi:/var/log/uwsgi in production
+        # Make sure the directory exists before running docker-compose
+        volumes:
+            - ./log/uwsgi:/var/log/uwsgi
+
+    nginx:
+
+        # Build the nginx service using the DockerFile in the nginx directory
+        build: ./nginx
+
+        # Provide a name for the nginx container
+        container_name: nginx
+
+        # Instruct Docker to always restart the service
+        restart: always
+
+        # Any ports listed using 'ports' will be exposed to the outside world
+        # Host to container mapping
+        ports:
+            - "80:80"
+
+        # Mount the container log directory to the local log directory
+        # Consider changing this to /var/log/uwsgi:/var/log/uwsgi in production
+        # Make sure the directory exists before running docker-compose
+        volumes:
+            - ./log/nginx:/var/log/nginx
